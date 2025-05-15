@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CompuTech – Admin Panel</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="container">
+    <div class="logo-area">
+      <img src="../images/logo.png" alt="CompuTech">
+      <h1>CompuTech</h1>
+    </div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="signup.html">Sign Up</a>
+      <a href="login.html">Log In</a>
+      <button id="logoutBtn" style="display:none">Logout</button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section>
+      <h3>Pending Student Approvals</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Roll No</th><th>Name</th><th>Email</th>
+            <th>Class</th><th>Board</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="studentsBody"></tbody>
+      </table>
+    </section>
+
+    <section>
+      <h3>Payments</h3>
+      <table>
+        <thead>
+  <tr>
+    <th>Roll No</th>
+    <th>Student</th>
+    <th>Date</th>
+    <th>Method</th>
+    <th>Amount</th>
+    <th>Actions</th>
+    <th>Receipt</th>
+  </tr>
+</thead>
+
+        <tbody id="paymentsBody"></tbody>
+      </table>
+    </section>
+
+    <section>
+      <h3>Create Discount Coupon</h3>
+      <form id="refForm">
+        <input name="code"     type="text"   placeholder="Coupon Code (e.g. FRIEND100)" required>
+        <input name="discount" type="number" placeholder="Discount Amount (e.g. 100)" required>
+        <button type="submit">Create Coupon</button>
+      </form>
+      <h4>Existing Coupons</h4>
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th><th>Discount</th><th>Created By</th><th>Used By</th>
+          </tr>
+        </thead>
+        <tbody id="referralBody"></tbody>
+      </table>
+    </section>
+
+    <section>
+      <h3>Monthly Payments Summary</h3>
+      <table>
+        <thead>
+          <tr><th>Month</th><th>Count</th><th>Details</th></tr>
+        </thead>
+        <tbody id="statsBody"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script src="../js/app.js"></script>
+  <script>
+// Direct script to help debug
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('Admin page loaded. Adding debug hooks...');
+  
+  // Add debug button
+  const debugBtn = document.createElement('button');
+  debugBtn.textContent = 'Debug View Stats';
+  debugBtn.style.position = 'fixed';
+  debugBtn.style.bottom = '10px';
+  debugBtn.style.right = '10px';
+  debugBtn.style.zIndex = '9999';
+  debugBtn.style.padding = '10px';
+  debugBtn.style.backgroundColor = 'red';
+  debugBtn.style.color = 'white';
+  debugBtn.onclick = () => viewStats('2025-05');
+  
+  document.body.appendChild(debugBtn);
+  
+  // Override console to make it visible
+  const oldConsoleLog = console.log;
+  console.log = function(...args) {
+    oldConsoleLog.apply(console, args);
+    
+    const logDiv = document.getElementById('debug-log') || 
+      (function() {
+        const div = document.createElement('div');
+        div.id = 'debug-log';
+        div.style.position = 'fixed';
+        div.style.bottom = '50px';
+        div.style.right = '10px';
+        div.style.width = '300px';
+        div.style.height = '200px';
+        div.style.backgroundColor = 'rgba(0,0,0,0.8)';
+        div.style.color = 'lime';
+        div.style.fontSize = '12px';
+        div.style.padding = '10px';
+        div.style.overflow = 'auto';
+        div.style.zIndex = '9998';
+        document.body.appendChild(div);
+        return div;
+      })();
+    
+    const msg = document.createElement('div');
+    msg.textContent = args.map(a => typeof a === 'object' ? JSON.stringify(a) : a).join(' ');
+    logDiv.appendChild(msg);
+    logDiv.scrollTop = logDiv.scrollHeight;
+  };
+});
+</script>
+
+</body>
+</html>
