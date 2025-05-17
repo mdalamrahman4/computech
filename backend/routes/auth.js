@@ -38,6 +38,7 @@ router.post('/signup', async (req, res) => {
       email,
       class: cls,
       board,
+      school: req.body.school,
       passwordHash:    hash,
       referralCode:    myCode,
       signupCouponUsed: null,
@@ -101,16 +102,25 @@ router.post('/signup', async (req, res) => {
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   
-  // Check for admin login
+  // Admin login
   if (email === 'admin@compu.com' && password === 'admin123') {
-    req.session.role = 'admin'; // Ensure this matches what requireAdmin middleware checks
-    
-    // Add debug logging
-    console.log("Admin login successful, session set:", req.session);
-    
-    return res.json({ role: 'admin' });
+    req.session.regenerate((err) => {
+      if (err) return res.status(500).json({ error: 'Session error' });
+      
+      req.session.role = 'admin';
+      req.session.user = 'admin@compu.com';
+      
+      req.session.save((err) => {
+        if (err) {
+          console.error('Session save error:', err);
+          return res.status(500).json({ error: 'Session error' });
+        }
+        console.log("Admin session created:", req.session);
+        return res.json({ role: 'admin' });
+      });
+    });
+    return;
   }
-  
   // Student login code...
   const stu = await Student.findOne({ email });
   if (!stu || !stu.approved || !(await bcrypt.compare(password, stu.passwordHash))) {

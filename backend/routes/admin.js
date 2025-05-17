@@ -20,7 +20,7 @@ router.get('/students/pending', async (req, res) => {
   res.json(list);
 });
 // GET all students with last payment info
-router.get('/api/admin/students', requireAdmin, async (req, res) => {
+router.get('/students', requireAdmin, async (req, res) => {
   try {
     const students = await Student.aggregate([
       {
@@ -52,7 +52,7 @@ router.get('/api/admin/students', requireAdmin, async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
-router.get('/api/admin/students/search', requireAdmin, async (req, res) => {
+router.get('/students/search', requireAdmin, async (req, res) => {
   const query = req.query.q;
   try {
     const students = await Student.find({

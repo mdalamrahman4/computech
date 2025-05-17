@@ -20,29 +20,32 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
 // Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// In server.js
+//app.use('/api/admin', adminRoutes); // This makes all admin.js routes start with /api/admin
 
 // Session with proper cookie settings
 // Session with proper cookie settings
 // Session configuration in server.js
 app.use(session({
   secret: process.env.SESSION_SECRET || 'computech-secret-key',
-  resave: true,              // CRITICAL: Changed to true
-  saveUninitialized: true,   // CRITICAL: Changed to true
-  store: MongoStore.create({ 
+  resave: true,
+  saveUninitialized: true,
+  store: MongoStore.create({
     mongoUrl: process.env.MONGO_URI,
-    touchAfter: 24 * 3600    // Reduces unnecessary DB writes
+    ttl: 24 * 60 * 60 // 1 day
   }),
   cookie: {
     maxAge: 24 * 60 * 60 * 1000,
     sameSite: 'lax',
-    secure: false,           // Must be false for HTTP
-    httpOnly: true,
-    path: '/'
+    secure: false, // Set to true in production with HTTPS
+    httpOnly: true
   }
 }));
+
 app.get('/students.html', requireAdmin, (req, res) =>
   res.sendFile(path.join(__dirname, '..', 'public/pages/students.html'))
 );
+
 
 
 // Add this middleware to debug session issues
