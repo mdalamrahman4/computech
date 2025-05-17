@@ -282,6 +282,32 @@ function payMonth(month, discount) {
     modal.classList.add('active');
   }, 10);
 }
+async function loadStudents(search = '') {
+  try {
+    const url = search
+      ? `/api/admin/students/search?q=${encodeURIComponent(search)}`
+      : '/api/admin/students';
+    const students = await getJSON(url);
+    const tbody = document.getElementById('studentsList');
+    tbody.innerHTML = '';
+    students.forEach(student => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td data-label="Roll No">${student.rollNo}</td>
+        <td data-label="Name">${student.name}</td>
+        <td data-label="Class">${student.class}</td>
+        <td data-label="Board">${student.board}</td>
+        <td data-label="School">${student.school}</td>
+        <td data-label="Last Payment">${
+          student.lastPayment ? new Date(student.lastPayment).toLocaleDateString() : 'None'
+        }</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  } catch (err) {
+    showNotification('Failed to load students', 'error');
+  }
+}
 
 // Function to update UI based on selected payment method
 function updatePaymentMethod() {

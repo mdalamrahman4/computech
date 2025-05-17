@@ -40,6 +40,9 @@ app.use(session({
     path: '/'
   }
 }));
+app.get('/students.html', requireAdmin, (req, res) =>
+  res.sendFile(path.join(__dirname, '..', 'public/pages/students.html'))
+);
 
 
 // Add this middleware to debug session issues

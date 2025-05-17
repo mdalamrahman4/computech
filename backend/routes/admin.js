@@ -19,6 +19,53 @@ router.get('/students/pending', async (req, res) => {
   const list = await Student.find({ approved: false }).lean();
   res.json(list);
 });
+// GET all students with last payment info
+router.get('/api/admin/students', requireAdmin, async (req, res) => {
+  try {
+    const students = await Student.aggregate([
+      {
+        $lookup: {
+          from: 'payments',
+          localField: 'email',
+          foreignField: 'studentEmail',
+          as: 'payments'
+        }
+      },
+      {
+        $addFields: {
+          lastPayment: { $max: "$payments.date" }
+        }
+      },
+      {
+        $project: {
+          rollNo: 1,
+          name: 1,
+          class: 1,
+          board: 1,
+          school: 1,
+          lastPayment: 1
+        }
+      }
+    ]);
+    res.json(students);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+router.get('/api/admin/students/search', requireAdmin, async (req, res) => {
+  const query = req.query.q;
+  try {
+    const students = await Student.find({
+      $or: [
+        { name: { $regex: query, $options: 'i' } },
+        { rollNo: { $regex: query, $options: 'i' } }
+      ]
+    });
+    res.json(students);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 // Approve Student
 router.post('/students/approve/:id', async (req, res) => {
